@@ -1,25 +1,21 @@
-class Pipe(object):
-    def __init__(self, *args):
-        self.functions = args
-        self.state = {'error': '', 'result': None}
+from pipe import Pipe
+from utils import *
 
-    def __call__(self, value):
-        if not value:
-            raise "Not any value for running"
-        self.state['result'] = self.data_pipe(value)
-        return self.state
 
-    def _bind(self, value, function):
-        try:
-            if value:
-                return function(value)
-            else:
-                return None
-        except Exception as e:
-            self.state['error'] = e
+class Pipeline(object):
+    all_functions = None
 
-    def data_pipe(self, value):
-        c_value = value
-        for function in self.functions:
-            c_value = self._bind(c_value, function)
-        return c_value
+    def __init__(self, functions):
+        self.all_functions = functions
+
+    def _load_functions(self, name_functions):
+        return loading(self.all_functions, name_functions)
+
+    def __call__(self, name_functions, input_data):
+        if not isinstance(name_functions, list):
+            name_functions = [name_functions]
+        pipe = Pipe(*self._load_functions(name_functions))
+        return pipe(input_data)
+
+
+
